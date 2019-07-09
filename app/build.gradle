@@ -1,0 +1,150 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'io.fabric'
+
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+    flavorDimensions "default"
+
+    compileOptions {
+        encoding = 'UTF-8'
+    }
+
+    defaultConfig {
+        applicationId "br.com.battista.cocmanager"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary = true
+        multiDexEnabled true
+        buildConfigField "long", "BUILD_UPDATED", System.currentTimeMillis() + "L"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            resValue "string", "app_name", "BGScore"
+            resValue "string", "title_app", "BGScore"
+            buildConfigField "boolean", "LOGGLABE", "false"
+        }
+
+        debug {
+            minifyEnabled false
+            testCoverageEnabled = false
+            resValue "string", "app_name", "BGScore (debug)"
+            resValue "string", "title_app", "BGScore (debug)"
+            buildConfigField "boolean", "LOGGLABE", "true"
+        }
+    }
+
+    productFlavors {
+        prod {
+            applicationIdSuffix = ".app"
+            versionCode 1
+            versionName "1.0.0"
+        }
+        dev {
+            applicationIdSuffix = ".dev"
+            versionCode 1
+            versionName "1.0.0-beta"
+        }
+    }
+
+    android.variantFilter { variant ->
+        if (variant.buildType.name.equals('release')
+                &&  variant.getFlavors().get(0).name.equals('dev')) {
+            variant.setIgnore(true)
+        }
+    }
+
+    testOptions.unitTests.all {
+        testLogging {
+            events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
+        }
+    }
+
+    testOptions {
+        animationsDisabled = true
+    }
+
+    lintOptions {
+        abortOnError true
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    // Google Dependencies
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
+    implementation "com.android.support:appcompat-v7:$rootProject.ext.supportLibraryVersion"
+    implementation "com.android.support:support-v4:$rootProject.ext.supportLibraryVersion"
+
+    implementation "com.android.support:design:$rootProject.ext.supportLibraryVersion"
+    implementation "com.android.support:recyclerview-v7:$rootProject.ext.supportLibraryVersion"
+    implementation "com.android.support:cardview-v7:$rootProject.ext.supportLibraryVersion"
+    implementation "com.android.support.constraint:constraint-layout:$rootProject.ext.constraintVersion"
+    implementation "com.android.support:percent:$rootProject.ext.supportLibraryVersion"
+    implementation "com.android.support:support-vector-drawable:$rootProject.supportLibraryVersion"
+    implementation "com.google.guava:guava:$rootProject.ext.guavaVersion"
+
+    implementation "com.android.support:multidex:$rootProject.ext.multidexVersion"
+
+    // Detwork
+    implementation "com.amitshekhar.android:rx2-android-networking:$rootProject.rx2FastAndroidNetworking"
+
+    // Database
+    implementation "android.arch.persistence.room:rxjava2:$rootProject.roomDatabaseVersion"
+    kapt "android.arch.persistence.room:compiler:$rootProject.roomDatabaseVersion"
+
+    // Image
+    implementation "com.github.bumptech.glide:glide:$rootProject.glideVersion"
+    implementation "de.hdodenhof:circleimageview:$rootProject.ext.circleimageviewVersion"
+
+    // Parser
+    implementation "com.google.code.gson:gson:$rootProject.gsonVersion"
+
+    // Debug Database
+    debugImplementation "com.amitshekhar.android:debug-db:$rootProject.debugDBVersion"
+
+    // Dependency Injection
+    implementation "com.google.dagger:dagger:$rootProject.dagger2Version"
+    kapt "com.google.dagger:dagger-compiler:$rootProject.dagger2Version"
+    kapt "com.google.dagger:dagger-android-processor:$rootProject.dagger2Version"
+    implementation "com.google.dagger:dagger-android-support:$rootProject.dagger2Version"
+
+    // reactive
+    implementation "io.reactivex.rxjava2:rxjava:$rootProject.rxjava2Version"
+    implementation "io.reactivex.rxjava2:rxandroid:$rootProject.rxandroidVersion"
+
+    // code generator for view
+    implementation "com.jakewharton:butterknife:$rootProject.butterKnifeVersion"
+    kapt "com.jakewharton:butterknife-compiler:$rootProject.butterKnifeVersion"
+
+    // swipe view
+    implementation "com.mindorks:placeholderview:$rootProject.placeholderviewVersion"
+
+    // logger
+    implementation "com.jakewharton.timber:timber:$rootProject.timberVersion"
+
+    // Test Dependencies
+    testImplementation "junit:junit:$rootProject.ext.junitVersion"
+    testImplementation "org.hamcrest:hamcrest-core:$rootProject.ext.hamcrestVersion"
+    testImplementation "org.mockito:mockito-core:$rootProject.ext.mockitoVersion"
+    kaptTest "com.google.dagger:dagger-compiler:$rootProject.dagger2Version"
+
+    // Android Test Dependencies
+    androidTestImplementation "com.android.support.test:runner:$rootProject.ext.runnerVersion"
+    androidTestImplementation "com.android.support.test:rules:$rootProject.ext.rulesVersion"
+    androidTestImplementation "com.android.support.test.espresso:espresso-core:$rootProject.ext.espressoVersion"
+    androidTestImplementation "com.android.support.test.espresso:espresso-contrib:$rootProject.ext.espressoVersion"
+    androidTestImplementation "com.android.support.test.espresso:espresso-intents:$rootProject.ext.espressoVersion"
+    kaptAndroidTest "com.google.dagger:dagger-compiler:$rootProject.dagger2Version"
+
+    // Android Kotlin Extension
+    implementation "androidx.core:core-ktx:$rootProject.androidKTXVersion"
+}
